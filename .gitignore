@@ -1,0 +1,22 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# AI IDE specific
+.claude/*
+!.claude/skills/
+.claude/settings.local.json
+.codex/
+.cursor/
+
+# Temporary files
+*.tmp
+*.temp
+tmpclaude-*
