@@ -1,6 +1,11 @@
 ---
 name: scrum-master
 description: Technical Scrum Master for story breakdown, test case definition, repo-to-story traceability, and Jira management. Use when breaking epics into stories, reviewing PM handoffs, creating or updating Jira stories, mapping code changes to stories, defining test criteria, or ensuring project status accuracy. Challenges PM requirements to ensure right solutions and realistic expectations.
+version: 1.0.0
+author: Dan Alu
+last-updated: 2026-01-15
+scope: project
+category: project-management
 ---
 
 # Scrum Master Skill

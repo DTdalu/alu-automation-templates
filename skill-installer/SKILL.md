@@ -1,27 +1,66 @@
 ---
 name: skill-installer
-description: Install PM/SM skill templates into a project with project-specific Jira configuration. Use when setting up a new project with Claude Code skills or configuring skills for a team member.
+description: Install skill templates into a project with project-specific configuration. Reads from manifest.json for skill discovery and handles both project-scope and user-scope installations.
+version: 1.1.0
+author: Dan Alu
+last-updated: 2026-01-15
+scope: user
+category: meta
 ---
 
 # Skill Installer
 
-This meta-skill helps you install Product Manager and Scrum Master skills into any project with the correct Jira configuration.
+This meta-skill helps you install skills from the alu-automation-templates repository into any project with the correct configuration.
 
 ## How It Works
 
-1. You provide the Jira configuration values
-2. This skill reads template files and replaces placeholders
-3. Configured skills are written to your project's `.claude/skills/` folder
+1. Read `manifest.json` to discover available skills
+2. Prompt for required placeholder values
+3. Read template files and replace placeholders
+4. Write configured skills to appropriate location (project or user scope)
+
+## Quick Start
+
+```
+"Install scrum-master and product-manager skills in my project"
+"Install session-log skill for personal use"
+"Show available skills"
+```
+
+---
+
+## Available Skills
+
+| Skill | Category | Scope | Description |
+|-------|----------|-------|-------------|
+| **scrum-master** | Project Management | Project | Story breakdown, Jira management |
+| **product-manager** | Project Management | Project | PRD creation, status reporting |
+| **session-log** | Project Management | User | Session documentation for stand-ups |
+
+### Scope Explanation
+
+- **Project Scope**: Installed to `.claude/skills/` in the target project (shared with team via git)
+- **User Scope**: Installed to `~/.claude/skills/` (personal, not project-specific)
+
+---
 
 ## Required Information
 
-Before installation, gather these values from your Jira instance:
+### For Jira-Integrated Skills (scrum-master, product-manager)
 
 | Value | Description | Example |
 |-------|-------------|---------|
 | `CLOUD_ID` | Atlassian Cloud ID (UUID format) | `550c6b47-250d-452d-afe8-8e200810656f` |
 | `PROJECT_KEY` | Jira project key | `PE`, `DEV`, `PROJ` |
 | `EPIC_KEY` | Default epic key | `PE-38`, `DEV-100` |
+
+### For Session Log Skill
+
+| Value | Description | Example |
+|-------|-------------|---------|
+| `PROJECT_NAME` | Project name for headers | `Invoice Automation` |
+| `LOGS_PATH` | Where to store logs | `docs/logs/` |
+| `EPIC_KEY` | Optional epic for Jira context | `PE-38` |
 
 ### Finding Your Cloud ID
 
@@ -35,78 +74,96 @@ Tool: getAccessibleAtlassianResources
 
 ## Installation Workflow
 
-### Step 1: Collect Configuration
+### Step 1: Read Manifest
 
-Ask the user for:
-- Jira Cloud ID
-- Project Key
-- Default Epic Key
-- Target project path (e.g., `C:\Users\user\project`)
+Read `manifest.json` from the repo root to get:
+- Available skills and their metadata
+- Required placeholders for each skill
+- File paths and references
 
-### Step 2: Read Templates
-
-Templates are located in the `templates/` folder relative to this skill:
-```
-../templates/scrum-master/SKILL.template.md
-../templates/scrum-master/references/jira-patterns.template.md
-../templates/product-manager/SKILL.template.md
-../templates/product-manager/references/prd-template.md
-../templates/product-manager/references/status-report-template.md
-../templates/product-manager/references/jira-patterns.template.md
+```javascript
+// Parse manifest.json
+const manifest = JSON.parse(readFile('manifest.json'));
+const skills = manifest.skills;
 ```
 
-### Step 3: Replace Placeholders
+### Step 2: Select Skills
 
-Find and replace these placeholders in all `.template.md` files:
+Ask user which skills to install. Show:
+- Skill name and description
+- Scope (project vs user)
+- Required configuration values
 
-| Placeholder | Replace With |
-|-------------|--------------|
-| `{{CLOUD_ID}}` | User's Atlassian Cloud ID |
-| `{{PROJECT_KEY}}` | User's Jira Project Key |
-| `{{EPIC_KEY}}` | User's Default Epic Key |
+### Step 3: Collect Configuration
 
-### Step 4: Write to Project
+For each selected skill, collect required placeholders:
 
-Create the skill files in the target project:
-```
-{project}/.claude/skills/
-├── scrum-master/
-│   ├── SKILL.md
-│   └── references/
-│       └── jira-patterns.md
-└── product-manager/
-    ├── SKILL.md
-    └── references/
-        ├── prd-template.md
-        ├── status-report-template.md
-        └── jira-patterns.md
+```javascript
+// Example for scrum-master
+const config = {
+  CLOUD_ID: "user-provided-uuid",
+  PROJECT_KEY: "PE",
+  EPIC_KEY: "PE-38"
+};
 ```
 
-Note: Template files (`.template.md`) become regular markdown (`.md`) after placeholder replacement.
+### Step 4: Determine Target Paths
 
-### Step 5: Update .gitignore
+Based on skill scope from manifest:
 
-Ensure the project's `.gitignore` includes:
+```javascript
+// Project scope → .claude/skills/
+// User scope → ~/.claude/skills/
+
+const targetBase = skill.scope === 'project'
+  ? `${projectPath}/.claude/skills/`
+  : `~/.claude/skills/`;
+```
+
+### Step 5: Process Templates
+
+For each skill:
+
+1. Read all `.template.md` files from skill path
+2. Replace placeholders: `{{KEY}}` → configured value
+3. Rename files: `.template.md` → `.md`
+4. Write to target location
+
+```javascript
+// Template processing
+let content = readFile(templatePath);
+for (const [key, value] of Object.entries(config)) {
+  content = content.replaceAll(`{{${key}}}`, value);
+}
+writeFile(targetPath.replace('.template.md', '.md'), content);
+```
+
+### Step 6: Copy Reference Files
+
+Copy non-template reference files (like `prd-template.md`) without modification.
+
+### Step 7: Update .gitignore (Project Scope Only)
+
+For project-scope skills, ensure `.gitignore` includes:
+
 ```gitignore
-# AI IDE specific
+# Claude Code
 .claude/*
 !.claude/skills/
 .claude/settings.local.json
 ```
 
-This keeps skills in version control while excluding user-specific settings.
-
-### Step 6: Verify Installation
+### Step 8: Verify Installation
 
 After writing files:
-1. Confirm files exist in `.claude/skills/`
-2. Check placeholder replacement worked (no `{{` remaining)
-3. Advise user to restart Claude Code to pick up new skills
-4. Test with `/product-manager` or `/scrum-master` commands
+1. Confirm files exist in target location
+2. Check no `{{` placeholders remain (incomplete replacement)
+3. Advise user to restart Claude Code
+4. Test with skill command (e.g., `/scrum-master`)
 
 ---
 
-## Example Conversation
+## Example Installation Session
 
 ```
-User: Install PM/SM skills in my project
+User: Install PM and SM skills in C:\Users\me\projects\myapp

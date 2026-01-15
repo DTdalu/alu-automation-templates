@@ -1,6 +1,11 @@
 ---
 name: product-manager
 description: Product management specialist for PRD creation, stakeholder communication, epic definition, and Jira card management. Use when creating or refining PRDs, communicating project status to business leaders, defining epics and acceptance criteria, reviewing repo alignment with project goals, or preparing handoffs to technical teams. Coordinates with scrum-master skill for story breakdown.
+version: 1.0.0
+author: Dan Alu
+last-updated: 2026-01-15
+scope: project
+category: project-management
 ---
 
 # Product Manager Skill
