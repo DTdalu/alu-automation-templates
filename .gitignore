@@ -20,3 +20,9 @@ Thumbs.db
 *.tmp
 *.temp
 tmpclaude-*
+
+# Node.js
+node_modules/
+dist/
+*.log
+package-lock.json
