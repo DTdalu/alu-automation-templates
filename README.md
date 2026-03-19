@@ -1,199 +1,128 @@
-# Alu Automation Templates
+# SDLC Toolkit
 
-Reusable Claude Code skill templates for Product Management, Scrum Master, and developer productivity workflows with Jira integration.
+A Claude Code plugin that brings structured SDLC workflows to your engineering team. Guides the full pipeline from stakeholder problem to engineer-ready Jira stories with consistent templates, quality gates, and handoff protocols.
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](CHANGELOG.md)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+## What's included
 
-## Overview
+### Skills
 
-These templates allow you to install PM/SM/productivity skills into any project with project-specific configuration. Rather than hardcoding Jira Cloud IDs and project keys, the templates use placeholders that get replaced during installation.
+| Skill | What it does |
+|-------|-------------|
+| `/setup` | Configure Jira connection for your project (Cloud ID, project key) |
+| `/product-manager` | Interview stakeholders, define the problem, create a well-formed Jira epic |
+| `/scrum-master` | Review epic quality, break it into pointed stories with AC and test plans |
+| `/grill` | Stress-test any plan, epic, or story through relentless questioning |
 
-## Available Skills
+### Agents
 
-| Skill | Category | Scope | Description |
-|-------|----------|-------|-------------|
-| **scrum-master** | Project Management | Project | Story breakdown, test case definition, repo traceability, Jira management |
-| **product-manager** | Project Management | Project | PRD creation, status reporting, epic definition, stakeholder communication |
-| **session-log** | Project Management | User | Session documentation for stand-ups, git activity capture, Jira context |
+| Agent | What it does |
+|-------|-------------|
+| `jira-worker` | Bulk Jira operations (batch story creation, comment posting, queries) |
 
-### Scope Types
+### References
 
-- **Project Scope**: Installed to `.claude/skills/` in your project (shared with team via git)
-- **User Scope**: Installed to `~/.claude/skills/` (personal, follows you across projects)
+| File | What it covers |
+|------|---------------|
+| `jira-conventions.md` | Comment tags, status flow, Definition of Done |
 
-## Quick Start
+## Installation
 
-### Option 1: Manual Installation
+### Prerequisites
 
-1. Copy the desired skill folder from `templates/project-management/` to your target:
-   - **Project scope**: `{your-project}/.claude/skills/`
-   - **User scope**: `~/.claude/skills/`
+1. **Claude Code** installed with an active license
+2. **Atlassian MCP** configured in Claude Code (provides Jira API access)
 
-2. Rename `.template.md` files to `.md`
+### Install the plugin
 
-3. Find and replace placeholders:
-   - `{{CLOUD_ID}}` → Your Atlassian Cloud ID
-   - `{{PROJECT_KEY}}` → Your Jira project key (e.g., `PE`)
-   - `{{EPIC_KEY}}` → Your default epic key (e.g., `PE-38`)
+In Claude Code, run `/plugin` and add this repository's GitHub URL.
 
-### Option 2: Assisted Installation
+### First-time setup (per project)
 
-1. Open Claude Code in this repo
-2. Say: `"Install scrum-master and product-manager skills in C:\path\to\my\project"`
-3. Provide your Jira configuration when prompted
-4. Restart Claude Code in your project
-
-## Directory Structure
+In any project where you want to use the toolkit:
 
 ```
-alu-automation-templates/
-├── README.md
-├── CHANGELOG.md
-├── manifest.json                    # Machine-readable skill registry
-├── skill-installer/
-│   └── SKILL.md                     # Meta-skill for assisted installation
-└── templates/
-    └── project-management/
-        ├── scrum-master/
-        │   ├── SKILL.template.md
-        │   └── references/
-        │       └── jira-patterns.template.md
-        ├── product-manager/
-        │   ├── SKILL.template.md
-        │   └── references/
-        │       ├── prd-template.md
-        │       ├── status-report-template.md
-        │       └── jira-patterns.template.md
-        └── session-log/
-            ├── SKILL.template.md
-            └── templates/
-                └── session-log-template.md
+/setup
 ```
 
-## Finding Your Jira Configuration
+This will ask for your Jira Cloud ID and project key, verify connectivity, and save configuration to `.claude/sdlc-toolkit.local.md`.
 
-### Cloud ID
+**Important:** Add `.claude/sdlc-toolkit.local.md` to your `.gitignore` — it contains project-specific configuration.
 
-Use the Atlassian MCP tool:
-```javascript
-Tool: getAccessibleAtlassianResources
+## Usage
+
+### The pipeline: Problem → Engineer-ready stories
+
+**Step 1: Define the problem**
 ```
-
-Or extract from any Jira URL: `https://yoursite.atlassian.net/...`
-
-### Project Key
-
-The short prefix for your Jira issues (e.g., `PE` for issues like `PE-38`).
-
-### Epic Key
-
-The default epic for your project. This can be changed per-project.
-
-## Placeholders Reference
-
-| Placeholder | Description | Used By | Example |
-|-------------|-------------|---------|---------|
-| `{{CLOUD_ID}}` | Atlassian Cloud ID (UUID) | SM, PM | `550c6b47-250d-452d-afe8-8e200810656f` |
-| `{{PROJECT_KEY}}` | Jira project key | SM, PM, SL | `PE`, `DEV` |
-| `{{EPIC_KEY}}` | Default epic issue key | SM, PM, SL | `PE-38` |
-| `{{PROJECT_NAME}}` | Project name for headers | SL | `Invoice Automation` |
-| `{{LOGS_PATH}}` | Path for session logs | SL | `docs/logs/` |
-
-*SM = Scrum Master, PM = Product Manager, SL = Session Log*
-
-## After Installation
-
-### Update .gitignore (Project Scope Only)
-
-Add this to your project's `.gitignore` to include skills in version control:
-
-```gitignore
-# Claude Code
-.claude/*
-!.claude/skills/
-.claude/settings.local.json
+/product-manager
 ```
+Walk through a stakeholder interview. The skill asks pointed questions, challenges vague requirements, and produces a well-formed Jira epic with structured problem statement, testable requirements, and clear scope.
 
-### Test the Skills
-
-Restart Claude Code and try:
-- `/scrum-master` — Activate SM persona
-- `/product-manager` — Activate PM persona
-- `/session-log` — Generate session documentation
-
-## Skill Capabilities
-
-### Scrum Master Skill
-
-- **Epic Review & Challenge**: Push back on unclear requirements
-- **Story Breakdown**: Create testable, deployable stories
-- **Test Case Definition**: Given/When/Then acceptance criteria
-- **Repo Traceability**: Map code changes to stories
-- **Status Management**: Keep Jira accurate and actionable
-
-### Product Manager Skill
-
-- **PRD Creation**: Discovery-driven requirements through JTBD framework
-- **Status Reporting**: Executive-level updates posted to Jira
-- **Epic Definition**: Problem statements, scope boundaries, acceptance criteria
-- **Repo Alignment**: Map codebase to Jira stories
-
-### Session Log Skill
-
-- **Git Activity Capture**: Commits, PRs, file changes
-- **Accomplishment Tracking**: What was done and why
-- **Jira Context**: Ready-to-paste updates for stand-ups
-- **Cross-Skill Integration**: Feeds context to SM and PM skills
-
-## Coordination Protocol
-
-The skills use comment tags for clear handoffs:
-
-| Tag | Owner | Purpose |
-|-----|-------|---------|
-| `[PM HANDOFF]` | PM | Epic ready for story breakdown |
-| `[PM RESPONSE]` | PM | Answers to SM challenges |
-| `[SM REVIEW]` | SM | Initial review findings |
-| `[SM CHALLENGE]` | SM | Questions/concerns for PM |
-| `[SM READY]` | SM | Story is dev-ready |
-| `[SM UPDATE]` | SM | Progress update |
-
-## Version History
-
-See [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
-
-| Version | Date | Highlights |
-|---------|------|------------|
-| 1.0.0 | 2026-01-15 | Category structure, manifest.json, session-log skill, version tracking |
-| 0.1.0 | 2026-01-09 | Initial release with SM and PM skills |
-
-## Contributing
-
-To add new skills or improve existing ones:
-
-1. Create/modify templates in `templates/{category}/{skill}/`
-2. Use `{{PLACEHOLDER}}` syntax for project-specific values
-3. Add skill entry to `manifest.json`
-4. Update frontmatter with version info
-5. Document placeholders in this README
-6. Update CHANGELOG.md
-7. Test with the installer skill
-
-## Releases
-
-This repo uses GitHub Releases for distribution. Subscribe to releases to get notified of updates:
-
-```bash
-# Watch for new releases
-gh repo set-default DTdalu/alu-automation-templates
-gh release list
+**Step 2: Challenge the epic (optional but recommended)**
 ```
+/grill PE-42
+```
+Stress-test the epic. The skill probes every assumption, surfaces gaps in scope, edge cases in requirements, and missing error handling.
 
-## License
+**Step 3: Break into stories**
+```
+/scrum-master
+```
+The skill finds the epic's handoff tag, reviews it against a quality checklist, pushes back on weak spots, and breaks it into pointed vertical-slice stories — each with acceptance criteria, test plans, and tech stack notes.
 
-MIT License - See [LICENSE](LICENSE) for details.
+**Step 4: Challenge individual stories (optional)**
+```
+/grill PE-43
+```
+Stress-test any story before an engineer picks it up.
 
----
+### Jira comment conventions
 
-*Built with Claude Code by Dan Alu*
+The toolkit uses structured comment tags for workflow state. See `references/jira-conventions.md` for the full list:
+
+- `[HANDOFF] ...` — Work is being passed to the next stage
+- `[REVIEW] ...` — Feedback on someone's work
+- `[STATUS] ...` — Progress updates
+- `[BLOCKED] ...` — Work cannot proceed
+
+## Customization
+
+### For your team
+
+The skills are designed to work across different tech stacks and team structures. The only project-specific config is the Jira connection (managed by `/setup`).
+
+If you need to customize a skill for your team:
+1. Fork this repo
+2. Edit the relevant `SKILL.md` file
+3. Add team-specific templates or references
+4. Install your fork as a plugin instead
+
+### Adding tech-stack rules
+
+For project-specific coding conventions (Snowflake patterns, .NET standards, Angular guidelines), add rules directly to your project's `.claude/rules/` directory — not to this plugin. The plugin handles workflow; your project handles technical standards.
+
+## Roadmap
+
+### Phase 1 (current) — v1.0.0
+- [x] Setup wizard
+- [x] Product Manager skill
+- [x] Scrum Master skill
+- [x] Grill skill
+- [x] Jira worker agent
+- [x] Jira conventions reference
+
+### Phase 2 (planned)
+- [ ] Engineer skill (story implementation workflow)
+- [ ] Engineering Lead skill (code review, architecture decisions)
+
+### Phase 3 (planned)
+- [ ] Triage skill (bug triage and ticket creation)
+- [ ] Status Report skill (sprint status from Jira data)
+
+## Version history
+
+See [CHANGELOG.md](CHANGELOG.md).
+
+## Archive
+
+The `archive/` directory contains earlier iterations of skills and planning documents that informed this plugin's design. They are preserved for reference but are not part of the active plugin.
