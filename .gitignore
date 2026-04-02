@@ -15,6 +15,9 @@ Thumbs.db
 .codex/
 .cursor/
 
+# Archive (contains org-specific references)
+archive/
+
 # Temporary files
 *.tmp
 *.temp
