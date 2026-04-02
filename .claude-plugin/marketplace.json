@@ -1,0 +1,24 @@
+{
+  "name": "alu-automation",
+  "owner": {
+    "name": "Dan Alu"
+  },
+  "metadata": {
+    "description": "SDLC workflow plugins for Jira integration"
+  },
+  "plugins": [
+    {
+      "name": "sdlc-toolkit",
+      "source": {
+        "source": "github",
+        "repo": "DTdalu/alu-automation-templates"
+      },
+      "description": "Structured SDLC workflows with Jira integration. Guides the full pipeline from stakeholder problem to engineer-ready stories with consistent templates, quality gates, and handoff protocols.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Dan Alu"
+      },
+      "repository": "https://github.com/DTdalu/alu-automation-templates"
+    }
+  ]
+}
